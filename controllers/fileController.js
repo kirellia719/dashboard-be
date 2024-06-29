@@ -1,5 +1,5 @@
-import { google } from "googleapis";
-import credentials from "../key.js";
+const { google } = require("googleapis");
+const credentials = require("../key.js");
 
 const rootfolderId = `18c8QVxwWhrBLip7pedS-inL5B6uIEyV3`;
 
@@ -98,4 +98,4 @@ const downloadFile = async (req, res) => {
    } catch (error) {}
 };
 
-export default { uploadFile, getFiles, getParents, downloadFile };
+module.exports = { uploadFile, getFiles, getParents, downloadFile };

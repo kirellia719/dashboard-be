@@ -1,4 +1,4 @@
-export default {
+module.exports = {
    type: "service_account",
    project_id: "gothic-363008",
    private_key_id: "f18bfac7dd6a06b654e7c50ef7339965af3cfe01",

@@ -1,7 +1,7 @@
-import express from "express";
-import multer from "multer";
+const express = require("express");
+const multer = require("multer");
 
-import fileController from "../controllers/fileController.js";
+const fileController = require("../controllers/fileController.js");
 
 const router = express.Router();
 
@@ -13,4 +13,4 @@ router.get("/parents/:folderId", fileController.getParents);
 router.get("/download/:fileId", fileController.downloadFile);
 // router.get("/", fileController.getFiles);
 
-export default router;
+module.exports = router;

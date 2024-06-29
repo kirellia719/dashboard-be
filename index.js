@@ -1,10 +1,10 @@
-import express from "express";
-import dotenv from "dotenv";
-import morgan from "morgan";
-import cors from "cors";
-import mongoose from "mongoose";
+const express = require("express");
+const dotenv = require("dotenv");
+const morgan = require("morgan");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
-import router from "./routes/index.js";
+const router = require("./routes/index.js");
 
 const app = express();
 
@@ -18,13 +18,13 @@ app.use(morgan("short"));
 app.use("/", router);
 
 mongoose
-  .connect(process.env.MONGO_URL)
-  .then(() => {
-    const PORT = process.env.PORT || 8080;
-    app.listen(PORT, () => {
-      console.log(`Running: http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+   .connect(process.env.MONGO_URL)
+   .then(() => {
+      const PORT = process.env.PORT || 8080;
+      app.listen(PORT, () => {
+         console.log(`Running: http://localhost:${PORT}`);
+      });
+   })
+   .catch((err) => {
+      console.log(err);
+   });
