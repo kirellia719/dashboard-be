@@ -1,6 +1,8 @@
 const User = require("../models/User.js");
-
+const File = require("../models/File.js");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const login = async (req, res) => {
    try {
@@ -10,7 +12,7 @@ const login = async (req, res) => {
          if (user.password === password) {
             const { password, ...otherInfo } = user._doc;
             const token = jwt.sign({ ...otherInfo }, process.env.JWT_SECRET, {
-               expiresIn: "30m",
+               expiresIn: "10m",
             });
             res.json({
                status: 200,
@@ -50,15 +52,36 @@ const register = async (req, res) => {
             password,
             email,
          });
-         const result = await newUser.save();
-         res.json({
-            status: 200,
-            message: "Đăng ký thành công",
-            data: result,
-         });
+         const user = await newUser.save();
+
+         if (user) {
+            const rootFolder = new File({
+               name: username,
+               type: "folder",
+               isRoot: true,
+               ownerId: user._id,
+            });
+            await rootFolder.save();
+
+            res.json({
+               status: 200,
+               message: "Đăng ký thành công",
+            });
+         } else {
+            try {
+               if (user && user._id) {
+                  await user.delete();
+               }
+            } catch (error) {}
+            res.json({
+               status: 500,
+               message: "Lỗi hệ thống",
+            });
+         }
       }
    } catch (error) {
-      res.error(error);
+      console.log(error);
+      res.json({ status: 500, message: "Lỗi hệ thống" });
    }
 };
 
@@ -87,4 +110,32 @@ const getCurrentUser = async (req, res) => {
    }
 };
 
-module.exports = { login, register, getCurrentUser };
+const authenticate = (req, res, next) => {
+   try {
+      let token;
+      if (req.headers.authorization) {
+         token = req.headers.authorization.split(" ")[1];
+      } else {
+         res.json({ status: 401, message: "Không thể xác minh người dùng" });
+      }
+      try {
+         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+         req.user = decoded;
+         next();
+      } catch (error) {
+         res.json({
+            status: 401,
+            message: "Token hết hạn",
+            error: error,
+         });
+      }
+   } catch (error) {
+      console.log("authenticate", error);
+      res.json({
+         status: 500,
+         message: "Hệ thống lỗi",
+      });
+   }
+};
+
+module.exports = { login, register, getCurrentUser, authenticate };
