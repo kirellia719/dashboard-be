@@ -12,7 +12,7 @@ const login = async (req, res) => {
          if (user.password === password) {
             const { password, ...otherInfo } = user._doc;
             const token = jwt.sign({ ...otherInfo }, process.env.JWT_SECRET, {
-               expiresIn: "10m",
+               expiresIn: "1d",
             });
             res.json({
                status: 200,

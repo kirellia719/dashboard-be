@@ -198,6 +198,28 @@ const getSource = async (req, res) => {
    } catch (err) {}
 };
 
+const renameFolder = async (req, res) => {
+   try {
+      const { folderId } = req.params;
+      const { name } = req.body;
+      const file = await File.findById(folderId);
+      if (file && name) {
+         file.name = name.trim();
+         const newFile = await file.save();
+         res.json({
+            status: 200,
+            message: "Đã thay đổi tên thư mục",
+            data: newFile,
+         });
+      } else {
+         res.json({
+            status: 500,
+            message: "Lỗi hệ thống",
+         });
+      }
+   } catch (error) {}
+};
+
 module.exports = {
    uploadFile,
    getFiles,
@@ -205,4 +227,5 @@ module.exports = {
    createFolder,
    deleteItem,
    getSource,
+   renameFolder,
 };
