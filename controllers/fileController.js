@@ -8,7 +8,7 @@ const googleDriveId = process.env.DRIVE_FOLDER_ID;
 
 const uploadFile = async (req, res) => {
    const fileBuffer = req.file.buffer;
-   const fileName = req.file.originalname;
+   const fileName = req.body.fileName || req.file.originalName;
 
    try {
       let { folderId } = req.params;
@@ -220,6 +220,16 @@ const renameFolder = async (req, res) => {
    } catch (error) {}
 };
 
+const getView = (req, res) => {
+   const { fileId } = req.params;
+   try {
+      res.json({
+         status: 200,
+         data: `https://drive.google.com/file/d/${fileId}/view`,
+      });
+   } catch (error) {}
+};
+
 module.exports = {
    uploadFile,
    getFiles,
@@ -228,4 +238,5 @@ module.exports = {
    deleteItem,
    getSource,
    renameFolder,
+   getView,
 };

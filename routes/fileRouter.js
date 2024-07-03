@@ -9,7 +9,8 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get("/link/:fileId", fileController.getSource);
+router.get("/download/:fileId", fileController.getSource);
+router.get("/view/:fileId", fileController.getView);
 router.use(authController.authenticate);
 router.post("/upload/:folderId", upload.single("file"), fileController.uploadFile);
 router.post("/folder/:folderId", fileController.createFolder);
