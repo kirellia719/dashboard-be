@@ -34,8 +34,17 @@ const uploadFile = async (req, res) => {
       });
 
       if (data) {
+         let name = fileName.trim();
+         let fileExists = await File.findOne({ name, parentId: folderId });
+         let counter = 1;
+
+         while (fileExists) {
+            name = `(${counter}) ${fileName.trim()}`;
+            fileExists = await File.findOne({ name, parentId: folderId });
+            counter++;
+         }
          const file = await File.create({
-            name: fileName,
+            name,
             type: req.file.mimetype,
             parentId: folderId,
             ownerId: req.user._id,
@@ -106,7 +115,8 @@ const downloadFile = async (req, res) => {
 
 const createFolder = async (req, res) => {
    try {
-      const { name } = req.body;
+      let { name } = req.body;
+      name = name.trim();
       let { folderId } = req.params;
       if (folderId == "root") {
          const rootFolder = await File.findOne({ ownerId: req.user._id });
@@ -201,16 +211,24 @@ const getSource = async (req, res) => {
 const renameFolder = async (req, res) => {
    try {
       const { folderId } = req.params;
-      const { name } = req.body;
+      let { name } = req.body;
+      name = name.trim();
       const file = await File.findById(folderId);
       if (file && name) {
-         file.name = name.trim();
-         const newFile = await file.save();
-         res.json({
-            status: 200,
-            message: "Đã thay đổi tên thư mục",
-            data: newFile,
-         });
+         const checkExists = await File.findOne({ name, parentId: file.parentId });
+         if (checkExists) {
+            return res.json({
+               status: 400,
+               message: "Tên thư mục bị trùng",
+            });
+         } else {
+            const newFile = await file.save();
+            res.json({
+               status: 200,
+               message: "Đã thay đổi tên thư mục",
+               data: newFile,
+            });
+         }
       } else {
          res.json({
             status: 500,
