@@ -34,7 +34,20 @@ const uploadFile = async (req, res) => {
       });
 
       if (data) {
+         function removeFileExtension(filename) {
+            // Tìm vị trí của dấu chấm cuối cùng trong tên file
+            const lastDotIndex = filename.lastIndexOf(".");
+
+            // Nếu không tìm thấy dấu chấm hoặc dấu chấm nằm ở đầu tên file, trả về tên file gốc
+            if (lastDotIndex === -1 || lastDotIndex === 0) {
+               return filename;
+            }
+
+            // Trả về phần tên file trước dấu chấm cuối cùng
+            return filename.substring(0, lastDotIndex);
+         }
          let name = fileName.trim();
+         name = removeFileExtension(name);
          let fileExists = await File.findOne({ name, parentId: folderId });
          let counter = 1;
 
@@ -222,6 +235,7 @@ const renameFolder = async (req, res) => {
                message: "Tên thư mục bị trùng",
             });
          } else {
+            file.name = name;
             const newFile = await file.save();
             res.json({
                status: 200,
